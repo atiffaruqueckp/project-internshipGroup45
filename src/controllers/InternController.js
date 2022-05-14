@@ -22,16 +22,23 @@ const CreateIntern = async function (req, res) {
 
     if (Object.keys(data).length > 0) {
 
+      //validation, it is mandatory parts.
+
       if (!isValid(data.email)) { return res.status(400).send({ status: false, msg: "Email is required" }) }
       if (!isValid(data.name)) { return res.status(400).send({ status: false, msg: " name is required" }) }
-      if (!isValid(data.collegeId)) { return res.status(400).send({ status: false, msg: "College Id is required" }) }
+      //if (!isValid(data.collegeId)) { return res.status(400).send({ status: false, msg: "College Id is required" }) }
+      if (!isValid(data.mobile)) { return res.status(400).send({ status: false, msg: "mobile no is required" }) }
+      if (!isValid(data.collegeName)) { return res.status(400).send({ status: false, msg: "College name is required" }) }
+
 
       // if(data.collegeId>0)
 
-      if (!ObjectId.isValid(data.collegeId)) { return res.status(400).send({ status: false, msg: "Please provide a valid College Id" }) }
+      // if (!ObjectId.isValid(data.collegeId)) { return res.status(400).send({ status: false, msg: "Please provide a valid College Id" }) }
 
-      let CollegeCheckId = await CollegeModel.findOne({ _id: data.CollegeId, isDeleted: true })
-      if (CollegeCheckId) { return res.status(400).send({ msg: "This college is not providing internship right now, check for other colleges internship" }) }
+      //let CollegeCheckId = await CollegeModel.findOne({ _id: data.CollegeId, isDeleted: true })
+      //if (CollegeCheckId) { return res.status(400).send({ msg: "This college is not providing internship right now, check for other colleges internship" }) }
+
+      //checking uniqueness.
 
       if (!(/^\w+([\.-]?\w+)@\w+([\. -]?\w+)(\.\w{2,3})+$/.test(data.email))) {
         return res.status(400).send({ status: false, msg: "Please provide a valid email" })
@@ -50,8 +57,19 @@ const CreateIntern = async function (req, res) {
 
       if (dupliMobile) { return res.status(400).send({ status: false, msg: "Mobile Number already exists" }) }
 
-      let savedData = await InternModel.create(data);
-      return res.status(201).send({ InternDetails: savedData });
+      const collegeName = data.collegeName
+
+      const collegeId = await CollegeModel.findOne({ name: collegeName })
+
+      const newDataCollege = collegeId._id
+
+
+      const savedData = { name: data.name, email: data.email, mobile: data.mobile, collegeId: newDataCollege }
+      const InternDetails = await InternModel.create(savedData)
+      res.status(201).send({ status: true, InternDetails: savedData })
+
+      //let savedData = await InternModel.create(data);
+      //return res.status(201).send({ InternDetails: savedData });
 
     } else {
       return res.status(400).send({ ERROR: "BAD REQUEST" })

@@ -19,6 +19,7 @@ const CreateIntern = new mongoose.Schema(
         },
         mobile: {
             type: Number,
+            required: true,
             trim: true,
             unique: true,
             match: [/^([+]\d{2})?\d{10}$/, "please fill a valid mobile Number"],
@@ -29,7 +30,7 @@ const CreateIntern = new mongoose.Schema(
         collegeId: {
             required: true,
             type: mongoose.Types.ObjectId,
-            ref: "College",
+            ref: "Colleges",
         },
 
         isDeleted: {
